@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nikhil Tomar — Developer Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #090b0f;
+      --bg2:     #0e1117;
+      --bg3:     #131720;
+      --surface: #161c27;
+      --border:  rgba(255,255,255,0.06);
+      --accent:  #4af0c4;
+      --accent2: #7b61ff;
+      --red:     #ff6b6b;
+      --text:    #e8eaf0;
+      --muted:   #5a6070;
+      --mono:    'JetBrains Mono', monospace;
+      --sans:    'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CURSOR ── */
+    #cursor { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; mix-blend-mode: difference; }
+    #cursor-dot  { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: absolute; transform: translate(-50%,-50%); }
+    #cursor-ring { width: 36px; height: 36px; border: 1.5px solid rgba(74,240,196,0.5); border-radius: 50%; position: absolute; transform: translate(-50%,-50%); transition: width .25s, height .25s, opacity .25s; }
+    body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 56px; height: 56px; opacity: .6; }
+
+    /* ── NOISE ── */
+    body::before {
+      content:''; position:fixed; inset:0; z-index:0; opacity:.028; pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:200px 200px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position:fixed; top:0; width:100%; z-index:100;
+      padding:1.4rem 4rem;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid transparent;
+      transition:background .4s, border-color .4s, backdrop-filter .4s;
+    }
+    nav.scrolled { background:rgba(9,11,15,.88); backdrop-filter:blur(20px); border-color:var(--border); }
+    .nav-logo { font-family:var(--mono); font-size:1rem; color:var(--accent); text-decoration:none; letter-spacing:.04em; }
+    .nav-logo span { color:var(--muted); }
+    .nav-links { display:flex; gap:2.5rem; list-style:none; }
+    .nav-links a { font-family:var(--mono); font-size:.78rem; color:var(--muted); text-decoration:none; letter-spacing:.1em; text-transform:uppercase; transition:color .2s; }
+    .nav-links a:hover { color:var(--accent); }
+
+    section { position:relative; z-index:1; }
+
+    /* ── HERO ── */
+    #hero { min-height:100vh; display:flex; align-items:center; padding:8rem 4rem 4rem; overflow:hidden; }
+    .hero-bg {
+      position:absolute; inset:0;
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(74,240,196,.045) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 15% 85%, rgba(123,97,255,.07) 0%, transparent 60%);
+    }
+    .hero-grid {
+      position:absolute; inset:0;
+      background-image: linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+      background-size:60px 60px;
+      mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    }
+    .hero-content { max-width:920px; position:relative; }
+    .hero-tag {
+      font-family:var(--mono); font-size:.75rem; color:var(--accent);
+      letter-spacing:.2em; text-transform:uppercase;
+      margin-bottom:1.5rem; display:flex; align-items:center; gap:.75rem;
+    }
+    .hero-tag::before { content:''; display:block; width:32px; height:1px; background:var(--accent); }
+    .jp-accent { font-size:.9rem; color:var(--accent2); margin-left:.5rem; }
+    h1 { font-size:clamp(3rem,8vw,7rem); font-weight:800; line-height:1.0; letter-spacing:-.03em; margin-bottom:1.5rem; }
+    h1 .name { display:block; color:var(--text); }
+    h1 .role { display:block; background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero-desc { font-family:var(--mono); font-size:1rem; color:var(--muted); max-width:540px; line-height:1.9; margin-bottom:3rem; }
+    .hero-desc em { color:var(--accent); font-style:normal; }
+    .hero-cta { display:flex; gap:1.2rem; flex-wrap:wrap; }
+    .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.85rem 2rem; font-family:var(--mono); font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; border-radius:2px; transition:all .25s; cursor:none; }
+    .btn-primary { background:var(--accent); color:#000; font-weight:500; }
+    .btn-primary:hover { background:#fff; transform:translateY(-2px); }
+    .btn-ghost { border:1px solid var(--border); color:var(--muted); background:transparent; }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); transform:translateY(-2px); }
+    .scroll-hint { position:absolute; bottom:3rem; left:4rem; display:flex; align-items:center; gap:.75rem; font-family:var(--mono); font-size:.7rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; animation:fadeUp 1s 1.5s both; }
+    .scroll-line { width:1px; height:48px; background:linear-gradient(to bottom,var(--accent),transparent); animation:scrollPulse 2s ease-in-out infinite; }
+    @keyframes scrollPulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+    /* ── ABOUT ── */
+    #about { padding:8rem 4rem; display:grid; grid-template-columns:1fr 1fr; gap:6rem; align-items:center; max-width:1200px; margin:0 auto; }
+    .section-label { font-family:var(--mono); font-size:.7rem; color:var(--accent); letter-spacing:.2em; text-transform:uppercase; margin-bottom:1rem; display:flex; align-items:center; gap:.6rem; }
+    .section-label::after { content:''; flex:1; max-width:40px; height:1px; background:var(--accent); opacity:.5; }
+    h2 { font-size:clamp(2rem,4vw,3rem); font-weight:700; line-height:1.15; letter-spacing:-.02em; margin-bottom:1.5rem; }
+    .about-text p { font-family:var(--mono); color:var(--muted); font-size:.92rem; line-height:1.9; margin-bottom:1.2rem; }
+    .about-text p em { color:var(--text); font-style:normal; }
+    .motto-block {
+      border-left:2px solid var(--accent2); padding:1rem 1.5rem; margin:1.5rem 0;
+      background:rgba(123,97,255,.05); border-radius:0 4px 4px 0;
+    }
+    .motto-block p { color:var(--text) !important; font-style:italic; margin:0 !important; }
+    .about-stats { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:2.5rem; }
+    .stat { border:1px solid var(--border); padding:1.5rem; background:var(--surface); position:relative; overflow:hidden; }
+    .stat::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:linear-gradient(to bottom,var(--accent),var(--accent2)); }
+    .stat-num { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .stat-label { font-family:var(--mono); font-size:.72rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-top:.3rem; }
+    .about-visual { position:relative; aspect-ratio:4/5; max-width:380px; }
+    .avatar-frame { width:100%; height:100%; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; flex-direction:column; gap:1rem; }
+    .avatar-frame::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 50% 30%,rgba(74,240,196,.08) 0%,transparent 70%); }
+    .avatar-img { width:160px; height:160px; border-radius:50%; border:2px solid rgba(74,240,196,.3); object-fit:cover; position:relative; z-index:1; }
+    .avatar-jp { font-size:1.2rem; color:var(--muted); font-family:var(--mono); position:relative; z-index:1; letter-spacing:.1em; }
+    .avatar-corner { position:absolute; width:24px; height:24px; border-color:var(--accent); border-style:solid; opacity:.6; }
+    .avatar-corner.tl { top:-1px; left:-1px; border-width:2px 0 0 2px; }
+    .avatar-corner.tr { top:-1px; right:-1px; border-width:2px 2px 0 0; }
+    .avatar-corner.bl { bottom:-1px; left:-1px; border-width:0 0 2px 2px; }
+    .avatar-corner.br { bottom:-1px; right:-1px; border-width:0 2px 2px 0; }
+
+    /* ── SKILLS ── */
+    #skills { padding:8rem 4rem; background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .skills-inner { max-width:1200px; margin:0 auto; }
+    .skills-header { text-align:center; margin-bottom:4rem; }
+    .skills-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1.5rem; }
+    .skill-card { background:var(--bg3); border:1px solid var(--border); padding:2rem; position:relative; transition:border-color .3s,transform .3s; }
+    .skill-card:hover { border-color:rgba(74,240,196,.3); transform:translateY(-4px); }
+    .skill-icon { font-size:1.8rem; margin-bottom:1rem; }
+    .skill-name { font-size:1rem; font-weight:700; margin-bottom:.5rem; }
+    .skill-desc { font-family:var(--mono); font-size:.78rem; color:var(--muted); line-height:1.7; margin-bottom:1.2rem; }
+    .skill-bar-bg { height:2px; background:var(--border); border-radius:2px; overflow:hidden; }
+    .skill-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; transform-origin:left; transform:scaleX(0); transition:transform 1s cubic-bezier(.25,1,.5,1); }
+    .skill-bar.animated { transform:scaleX(1); }
+    .skill-tags { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:1rem; }
+    .tag { font-family:var(--mono); font-size:.65rem; padding:.2rem .6rem; background:var(--surface); border:1px solid var(--border); color:var(--muted); letter-spacing:.06em; border-radius:2px; }
+
+    /* Japanese learning progress */
+    .jp-card {
+      background:linear-gradient(135deg,rgba(123,97,255,.08),rgba(74,240,196,.05));
+      border:1px solid rgba(123,97,255,.2);
+      grid-column:span 2;
+      padding:2rem;
+    }
+    .jlpt-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin-top:1.5rem; }
+    .jlpt-level { text-align:center; padding:1rem .5rem; border:1px solid var(--border); background:var(--bg); position:relative; }
+    .jlpt-level.done { border-color:var(--accent); }
+    .jlpt-level.active { border-color:var(--accent2); }
+    .jlpt-name { font-weight:700; font-size:1.1rem; margin-bottom:.3rem; }
+    .jlpt-level.done .jlpt-name { color:var(--accent); }
+    .jlpt-level.active .jlpt-name { color:var(--accent2); }
+    .jlpt-status { font-family:var(--mono); font-size:.65rem; color:var(--muted); letter-spacing:.08em; }
+
+    /* ── PROJECTS ── */
+    #projects { padding:8rem 4rem; max-width:1200px; margin:0 auto; }
+    .projects-header { margin-bottom:3rem; }
+    .projects-grid { display:grid; grid-template-columns:repeat(12,1fr); gap:1.5rem; }
+    .project-card { background:var(--surface); border:1px solid var(--border); padding:2.5rem; position:relative; transition:border-color .3s,transform .3s; overflow:hidden; }
+    .project-card:hover { border-color:rgba(74,240,196,.25); transform:translateY(-4px); }
+    .project-card::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(74,240,196,.03),transparent); opacity:0; transition:opacity .3s; }
+    .project-card:hover::after { opacity:1; }
+    .project-card.featured { grid-column:span 7; }
+    .project-card.normal  { grid-column:span 5; }
+    .project-card.full    { grid-column:span 12; display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
+    .project-num { font-family:var(--mono); font-size:.68rem; color:var(--accent); letter-spacing:.15em; margin-bottom:1rem; }
+    .project-title { font-size:1.4rem; font-weight:700; margin-bottom:.75rem; letter-spacing:-.01em; }
+    .project-desc { font-family:var(--mono); font-size:.8rem; color:var(--muted); line-height:1.8; margin-bottom:1.5rem; }
+    .project-stack { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.5rem; }
+    .project-links { display:flex; gap:1rem; }
+    .project-link { font-family:var(--mono); font-size:.72rem; color:var(--muted); text-decoration:none; letter-spacing:.08em; text-transform:uppercase; display:flex; align-items:center; gap:.35rem; transition:color .2s; cursor:none; }
+    .project-link:hover { color:var(--accent); }
+    .project-link svg { width:14px; height:14px; }
+    .project-visual { background:var(--bg); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; padding:2rem; position:relative; overflow:hidden; }
+    .project-visual::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(74,240,196,.04),rgba(123,97,255,.04)); }
+    .jp-chars { font-size:3rem; letter-spacing:.2em; opacity:.4; position:relative; z-index:1; }
+
+    /* ── BLOG ── */
+    #blog { padding:8rem 4rem; background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .blog-inner { max-width:1200px; margin:0 auto; }
+    .blog-note { font-family:var(--mono); font-size:.8rem; color:var(--muted); margin-top:-.5rem; margin-bottom:3rem; }
+    .blog-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+    .blog-card { border:1px solid var(--border); background:var(--bg3); padding:2rem; transition:border-color .3s,transform .3s; cursor:none; }
+    .blog-card:hover { border-color:rgba(74,240,196,.25); transform:translateY(-4px); }
+    .blog-date { font-family:var(--mono); font-size:.68rem; color:var(--accent); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.75rem; }
+    .blog-title { font-size:1.1rem; font-weight:700; margin-bottom:.75rem; line-height:1.3; }
+    .blog-excerpt { font-family:var(--mono); font-size:.78rem; color:var(--muted); line-height:1.8; margin-bottom:1.5rem; }
+    .blog-tag-jp { display:inline-block; font-family:var(--mono); font-size:.65rem; padding:.2rem .6rem; background:rgba(123,97,255,.1); border:1px solid rgba(123,97,255,.25); color:var(--accent2); border-radius:2px; margin-bottom:.75rem; }
+
+    /* ── CONTACT ── */
+    #contact { padding:8rem 4rem; max-width:700px; margin:0 auto; text-align:center; }
+    #contact h2 { font-size:clamp(2.5rem,5vw,4rem); margin-bottom:1rem; }
+    #contact .contact-sub { font-family:var(--mono); color:var(--muted); font-size:.9rem; line-height:1.9; margin-bottom:3rem; }
+    .contact-form { display:flex; flex-direction:column; gap:1rem; text-align:left; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .form-group { display:flex; flex-direction:column; gap:.5rem; }
+    .form-label { font-family:var(--mono); font-size:.7rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; }
+    .form-input, .form-textarea { background:var(--surface); border:1px solid var(--border); color:var(--text); font-family:var(--mono); font-size:.88rem; padding:.85rem 1rem; outline:none; transition:border-color .2s; border-radius:2px; resize:none; }
+    .form-input:focus, .form-textarea:focus { border-color:rgba(74,240,196,.5); }
+    .form-textarea { min-height:140px; }
+    .form-submit { align-self:flex-start; border:none; }
+    .contact-alts { display:flex; justify-content:center; gap:2rem; margin-top:3rem; flex-wrap:wrap; }
+    .contact-alt { font-family:var(--mono); font-size:.75rem; color:var(--muted); text-decoration:none; letter-spacing:.08em; text-transform:uppercase; display:flex; align-items:center; gap:.4rem; transition:color .2s; }
+    .contact-alt:hover { color:var(--accent); }
+
+    /* ── FOOTER ── */
+    footer { border-top:1px solid var(--border); padding:2rem 4rem; display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; }
+    footer p { font-family:var(--mono); font-size:.72rem; color:var(--muted); letter-spacing:.08em; }
+    footer a { color:var(--accent); text-decoration:none; }
+    .footer-jp { color:var(--accent2); font-size:.9rem; }
+
+    /* ── ANIMS ── */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .reveal { opacity:0; transform:translateY(30px); transition:opacity .7s cubic-bezier(.25,1,.5,1),transform .7s cubic-bezier(.25,1,.5,1); }
+    .reveal.visible { opacity:1; transform:none; }
+    .reveal-delay-1 { transition-delay:.1s; }
+    .reveal-delay-2 { transition-delay:.2s; }
+    .reveal-delay-3 { transition-delay:.3s; }
+    .hero-content > * { animation:fadeUp .9s cubic-bezier(.25,1,.5,1) both; }
+    .hero-tag  { animation-delay:.1s; }
+    h1         { animation-delay:.25s; }
+    .hero-desc { animation-delay:.4s; }
+    .hero-cta  { animation-delay:.55s; }
+
+    @media (max-width:900px) {
+      nav { padding:1.2rem 2rem; }
+      .nav-links { display:none; }
+      #hero,#about,#skills,#projects,#blog,#contact { padding:5rem 2rem; }
+      #about { grid-template-columns:1fr; gap:3rem; }
+      .about-visual { display:none; }
+      .projects-grid { display:flex; flex-direction:column; }
+      .project-card.full { grid-template-columns:1fr; }
+      .blog-grid { grid-template-columns:1fr; }
+      footer { flex-direction:column; gap:1rem; text-align:center; }
+      .form-row { grid-template-columns:1fr; }
+      .jlpt-grid { grid-template-columns:repeat(3,1fr); }
+      .jp-card { grid-column:span 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cursor">
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-logo" href="#hero">&lt;<span>nikhil</span> /&gt;</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#blog">Blog</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <p class="hero-tag">Open to internships &amp; collaborations <span class="jp-accent">🇯🇵</span></p>
+    <h1>
+      <span class="name">Nikhil Tomar</span>
+      <span class="role">Aspiring Software<br>Engineer.</span>
+    </h1>
+    <p class="hero-desc">
+      BCA student @ Amity University, Noida. Building with <em>MERN · Java · DSA · Python · CSS3 · HTML5 · TypeScript · C++ · React.js · Vue.js · Angular · Tailwind CSS · Bootstrap · Sass · SCSS · Redux Toolkit · Node.js · Java · Go · PHP · FastAPI · Graph APIs · JWT/QAuth · My SQL · SQL Server · MongoDB · Mongoose · AWD · Google Cloud · Docker · GitHub Actions · GitLab CI</em>.<br>
+      Dreaming of engineering software in Japan — one commit at a time.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#projects">View Projects</a>
+      <a class="btn btn-ghost" href="#contact">Get in Touch</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-text reveal">
+    <p class="section-label">About Me</p>
+    <h2>Discipline is my boost.</h2>
+    <p>I'm a BCA student at Amity University, Noida, who started coding in 2020 — learning from Google, Harvard's CS50, and sheer stubbornness. I'm passionate about software engineering and AI, and I build every project with the craft it deserves.</p>
+    <p>Beyond code: I experiment in the kitchen, stay obsessively organised, and I'm currently on a <em>year-long Japanese immersion</em> at Mosai (Jan–Dec 2026) with a clear goal — work as an IT developer in Japan.</p>
+    <div class="motto-block">
+      <p>"Discipline is my boost." — I stay consistent and focused in coding, Japanese, and building my tech career.</p>
+    </div>
+    <div class="about-stats">
+      <div class="stat">
+        <div class="stat-num">2020</div>
+        <div class="stat-label">Started coding</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">MERN</div>
+        <div class="stat-label">Primary stack</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">N4</div>
+        <div class="stat-label">JLPT target</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">🇯🇵</div>
+        <div class="stat-label">Dream destination</div>
+      </div>
+    </div>
+  </div>
+  <div class="about-visual reveal reveal-delay-2">
+    <div class="avatar-frame">
+      <div class="avatar-corner tl"></div>
+      <div class="avatar-corner tr"></div>
+      <div class="avatar-corner bl"></div>
+      <div class="avatar-corner br"></div>
+      <img
+        class="avatar-img"
+        src="https://avatars.githubusercontent.com/u/280573981?v=4"
+        alt="Nikhil Tomar"
+        onerror="this.style.display='none'"
+      />
+      <p class="avatar-jp">にほんごを学んでいます</p>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="skills-inner">
+    <div class="skills-header reveal">
+      <p class="section-label" style="justify-content:center">Skills</p>
+      <h2>Tools of the trade.</h2>
+    </div>
+    <div class="skills-grid">
+
+      <div class="skill-card reveal">
+        <div class="skill-icon">🌐</div>
+        <div class="skill-name">Frontend</div>
+        <div class="skill-desc">Building responsive, interactive UIs with modern web technologies.</div>
+        <div class="skill-bar-bg"><div class="skill-bar" data-width=".82"></div></div>
+        <div class="skill-tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">React</span></div>
+      </div>
+
+      <div class="skill-card reveal reveal-delay-1">
+        <div class="skill-icon">⚙️</div>
+        <div class="skill-name">Backend</div>
+        <div class="skill-desc">Designing APIs and server-side logic with Node, Express and MongoDB.</div>
+        <div class="skill-bar-bg"><div class="skill-bar" data-width=".75"></div></div>
+        <div class="skill-tags"><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">MongoDB</span><span class="tag">REST API</span></div>
+      </div>
+
+      <div class="skill-card reveal reveal-delay-2">
+        <div class="skill-icon">☕</div>
+        <div class="skill-name">Java & DSA</div>
+        <div class="skill-desc">Strong foundations in object-oriented programming and data structures.</div>
+        <div class="skill-bar-bg"><div class="skill-bar" data-width=".78"></div></div>
+        <div class="skill-tags"><span class="tag">Java</span><span class="tag">OOP</span><span class="tag">Algorithms</span><span class="tag">Problem Solving</span></div>
+      </div>
+
+      <div class="skill-card reveal reveal-delay-1">
+        <div class="skill-icon">🐍</div>
+        <div class="skill-name">Python</div>
+        <div class="skill-desc">Scripting, automation, and exploring AI/ML applications.</div>
+        <div class="skill-bar-bg"><div class="skill-bar" data-width=".70"></div></div>
+        <div class="skill-tags"><span class="tag">Python</span><span class="tag">Scripting</span><span class="tag">Automation</span><span class="tag">AI/ML</span></div>
+      </div>
+
+      <!-- Japanese Learning — special wide card -->
+      <div class="skill-card jp-card reveal reveal-delay-2" style="grid-column:span 2">
+        <div class="skill-icon">🇯🇵</div>
+        <div class="skill-name">日本語 — Japanese</div>
+        <div class="skill-desc">Formally studying at Mosai (Jan–Dec 2026). Covering N5 grammar, kanji (100+), and vocabulary. JLPT N4 is the next milestone on the road to working in Japan.</div>
+        <div class="jlpt-grid">
+          <div class="jlpt-level done"><div class="jlpt-name">N5</div><div class="jlpt-status">✅ Achieved</div></div>
+          <div class="jlpt-level active"><div class="jlpt-name">N4</div><div class="jlpt-status">✅ Achieved</div></div>
+          <div class="jlpt-level"><div class="jlpt-name">N3</div><div class="jlpt-status">✅ Achieved</div></div>
+          <div class="jlpt-level"><div class="jlpt-name">N2</div><div class="jlpt-status">📅 ✅ Achieved</div></div>
+          <div class="jlpt-level"><div class="jlpt-name">N1</div><div class="jlpt-status">🌟 Planned</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="projects-header reveal">
+    <p class="section-label">Projects</p>
+    <h2>Things I've built.</h2>
+  </div>
+  <div class="projects-grid">
+
+    <!-- Project 1: watashi-no-nihongo -->
+    <div class="project-card featured reveal">
+      <div class="project-num">01 — Pinned</div>
+      <div class="project-title">watashi-no-nihongo</div>
+      <div class="project-desc">
+        A personal documentation of my Japanese language journey — tracking JLPT progress, N5 grammar, 100+ kanji, vocabulary lists, and milestones from beginner to conversational fluency. Started May 2023, now in formal Mosai training.
+      </div>
+      <div class="project-stack">
+        <span class="tag">Markdown</span><span class="tag">JLPT N5</span><span class="tag">N5 Kanji</span><span class="tag">Grammar</span>
+      </div>
+      <div class="project-links">
+        <a class="project-link" href="https://github.com/nikhiltomar2712/watashi-no-nihongo" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+
+    <!-- Project 2: Discord Server -->
+    <div class="project-card normal reveal reveal-delay-1">
+      <div class="project-num">02 — Pinned</div>
+      <div class="project-title">Discord Server</div>
+      <div class="project-desc">A community Discord server — open for collaborations, learning discussions, and connecting with fellow developers and Japanese learners.</div>
+      <div class="project-stack">
+        <span class="tag">Community</span><span class="tag">Discord</span>
+      </div>
+      <div class="project-links">
+        <a class="project-link" href="https://discord.gg/S8ghkzPErv" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Join Server
+        </a>
+        <a class="project-link" href="https://github.com/nikhiltomar2712/Discord-Server" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+
+    <!-- Project 3: Coming soon -->
+    <div class="project-card full reveal">
+      <div>
+        <div class="project-num">03 — In Progress</div>
+        <div class="project-title">MERN Stack App</div>
+        <div class="project-desc">
+          A full-stack MERN application currently in development. Building with React on the frontend, Node.js + Express on the backend, and MongoDB for data persistence. Stay tuned — it'll be live on GitHub soon.
+        </div>
+        <div class="project-stack">
+          <span class="tag">MongoDB</span><span class="tag">Express</span><span class="tag">React</span><span class="tag">Node.js</span>
+        </div>
+        <div class="project-links">
+          <a class="project-link" href="https://github.com/nikhiltomar2712" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            Watch on GitHub
+          </a>
+        </div>
+      </div>
+      <div class="project-visual">
+        <div class="jp-chars">日本語<br>コード</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BLOG (Learning Log) -->
+<section id="blog">
+  <div class="blog-inner">
+    <div class="reveal">
+      <p class="section-label">Learning Log</p>
+      <h2>Thoughts on the journey.</h2>
+      <p class="blog-note">// Ideas, lessons, and reflections I'm building up to write about.</p>
+    </div>
+    <div class="blog-grid">
+
+      <div class="blog-card reveal">
+        <div class="blog-tag-jp">🇯🇵 日本語</div>
+        <div class="blog-date">2026 — Ongoing</div>
+        <div class="blog-title">From N5 to N4: What formal Japanese classes at Mosai taught me</div>
+        <div class="blog-excerpt">A year of structured immersion: grammar patterns, kanji memory tricks, and why listening is harder than it looks.</div>
+      </div>
+
+      <div class="blog-card reveal reveal-delay-1">
+        <div class="blog-tag-jp">💻 Code</div>
+        <div class="blog-date">2025 — Reflection</div>
+        <div class="blog-title">Learning MERN from scratch: the honest developer's guide</div>
+        <div class="blog-excerpt">What Google and Harvard's CS50 taught me, what they didn't, and how I filled the gaps by building real projects.</div>
+      </div>
+
+      <div class="blog-card reveal reveal-delay-2">
+        <div class="blog-tag-jp">🎯 Career</div>
+        <div class="blog-date">2026 — Vision</div>
+        <div class="blog-title">Why I want to be a software engineer in Japan</div>
+        <div class="blog-excerpt">On combining a love for technology with a dream of living and working in Japan — and the disciplines both require.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="section-label" style="justify-content:center">Contact</p>
+  <h2>Let's connect.</h2>
+  <p class="contact-sub">Open to internships, collaborations, and opportunities — in India or Japan. Drop me a message and I'll get back to you. <br><span style="color:var(--accent2)">よろしくお願いします！</span></p>
+
+  <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input class="form-input" type="text" placeholder="Your name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" placeholder="your@email.com" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Subject</label>
+      <input class="form-input" type="text" placeholder="Internship / Collaboration / Hello" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message</label>
+      <textarea class="form-textarea" placeholder="Tell me about your idea or opportunity..."></textarea>
+    </div>
+    <button class="btn btn-primary form-submit" type="submit">Send Message</button>
+  </form>
+
+  <div class="contact-alts reveal">
+    <a class="contact-alt" href="mailto:nikhiltomarsan2712@gmail.com">✉ Email</a>
+    <a class="contact-alt" href="https://www.linkedin.com/in/nikhil-tomar27/" target="_blank">⌥ LinkedIn</a>
+    <a class="contact-alt" href="https://github.com/nikhiltomar2712" target="_blank">⌘ GitHub</a>
+    <a class="contact-alt" href="https://discord.gg/S8ghkzPErv" target="_blank">💬 Discord</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 <a href="#hero">Nikhil Tomar</a> — New Delhi, India</p>
+  <p><span class="footer-jp">一緒に頑張りましょう！</span> · <a href="https://github.com/nikhiltomar2712" target="_blank">GitHub ↗</a></p>
+</footer>
+
+<script>
+  // Cursor
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  (function raf(){
+    rx+=(mx-rx)*.18; ry+=(my-ry)*.18;
+    dot.style.transform=`translate(calc(${mx}px - 50%),calc(${my}px - 50%))`;
+    ring.style.transform=`translate(calc(${rx}px - 50%),calc(${ry}px - 50%))`;
+    requestAnimationFrame(raf);
+  })();
+
+  // Nav scroll
+  const nav=document.getElementById('nav');
+  window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>60);});
+
+  // Reveal on scroll
+  const reveals=document.querySelectorAll('.reveal');
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting) e.target.classList.add('visible');});
+  },{threshold:.12});
+  reveals.forEach(el=>observer.observe(el));
+
+  // Skill bars
+  document.querySelectorAll('.skill-card').forEach(card=>{
+    const bar=card.querySelector('.skill-bar');
+    if(!bar) return;
+    const w=bar.dataset.width||'0.75';
+    bar.style.setProperty('--w',w);
+    const obs=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ bar.style.transform=`scaleX(${w})`; bar.classList.add('animated'); }});
+    },{threshold:.3});
+    obs.observe(card);
+  });
+
+  // Contact form
+  function handleSubmit(e){
+    e.preventDefault();
+    const btn=e.target.querySelector('.form-submit');
+    btn.textContent='Sent ✓';
+    btn.style.background='#4af0c4';
+    setTimeout(()=>{btn.textContent='Send Message';btn.style.background='';},3000);
+  }
+</script>
+</body>
+</html>
